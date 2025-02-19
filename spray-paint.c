@@ -40,7 +40,7 @@ void generateUI()
     state->colorButtons->count = 0;
 
     unsigned char r, g, b, a;
-    int height = actrState->canvasSize.h / state->colorCount;
+    int height = actr_ui_state->canvas_size.h / state->colorCount;
     for (int i = 0; i < state->colorCount; i++)
     {
         if (i == 0)
@@ -102,9 +102,9 @@ void generateColorPicker(struct ActrUIControlButton *target)
 
     int top = target->control.leaf->bounds.point.y;
 
-    if (top + height > actrState->canvasSize.h)
+    if (top + height > actr_ui_state->canvas_size.h)
     {
-        top -= (top + height - actrState->canvasSize.h + 2);
+        top -= (top + height - actr_ui_state->canvas_size.h + 2);
     }
 
     state->pickerActive = 1;
@@ -225,6 +225,8 @@ void actr_pointer_tap(int x, int y)
 [[clang::export_name("actr_resize")]]
 void actr_resize(int w, int h)
 {
+    actr_ui_state->canvas_size.w = w;
+    actr_ui_state->canvas_size.h = h;
     actr_ui_invalidate();
 }
 
@@ -260,18 +262,18 @@ void paint(int x, int y)
         {
             bounds.point.x = PANEL_WIDTH;
         }
-        else if (bounds.point.x + bounds.size.w >= actrState->canvasSize.w)
+        else if (bounds.point.x + bounds.size.w >= actr_ui_state->canvas_size.w)
         {
-            bounds.point.x -= ((bounds.point.x + bounds.size.w + 1) - actrState->canvasSize.w);
+            bounds.point.x -= ((bounds.point.x + bounds.size.w + 1) - actr_ui_state->canvas_size.w);
         }
 
         if (y < 0)
         {
             y = 0;
         }
-        else if (bounds.point.y + bounds.size.h >= actrState->canvasSize.h)
+        else if (bounds.point.y + bounds.size.h >= actr_ui_state->canvas_size.h)
         {
-            bounds.point.y -= ((bounds.point.y + bounds.size.h + 1) - actrState->canvasSize.h);
+            bounds.point.y -= ((bounds.point.y + bounds.size.h + 1) - actr_ui_state->canvas_size.h);
         }
 
         // actr_quad_tree_query(state->tree, &bounds, state->results);
