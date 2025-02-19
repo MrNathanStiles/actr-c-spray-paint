@@ -28,6 +28,7 @@ struct MyState
 
 struct MyState *state;
 
+void genui(int w, int h);
 void generateUI()
 {
     struct ActrUIControlButton *button;
@@ -41,6 +42,7 @@ void generateUI()
 
     unsigned char r, g, b, a;
     int height = actr_ui_state->canvas_size.h / state->colorCount;
+    genui(actr_ui_state->canvas_size.w, actr_ui_state->canvas_size.h);
     for (int i = 0; i < state->colorCount; i++)
     {
         if (i == 0)
@@ -119,9 +121,9 @@ void generateColorPicker(struct ActrUIControlButton *target)
     state->changeButton = target;
 }
 [[clang::export_name("actr_init")]]
-void actr_init()
+void actr_init(int w, int h)
 {
-    actr_ui_init();
+    actr_ui_init(w, h);
     state = actr_malloc(sizeof(struct MyState));
     state->color = actr_pack_bytes(255, 255, 255, 100);
     state->result = actr_vector_init(4, 4);
@@ -221,12 +223,13 @@ void actr_pointer_tap(int x, int y)
         state->delete = 0;
     }
 }
-
+void canvas_sized(int w, int h);
 [[clang::export_name("actr_resize")]]
 void actr_resize(int w, int h)
 {
     actr_ui_state->canvas_size.w = w;
     actr_ui_state->canvas_size.h = h;
+    canvas_sized(w, h);
     actr_ui_invalidate();
 }
 
@@ -242,7 +245,7 @@ void actr_pointer_up(int x, int y)
     state->pointerDown = 0;
     state->nopaint = 0;
 }
-
+void container(int x, int y, int w, int h);
 void paint(int x, int y)
 {
     if (state->pointerDown == 0 || actr_ui_state->hovered > 0)
@@ -282,6 +285,7 @@ void paint(int x, int y)
         {
             if (state->delete == 0)
             {
+                container(bounds.point.x, bounds.point.y, bounds.size.w, bounds.size.h);
                 struct ActrUIControlContainer *container = actr_ui_container(bounds.point.x, bounds.point.y, bounds.size.w, bounds.size.h);
                 container->control.backgroundColor = state->color;
                 container->control.foregroundColor = state->color;
