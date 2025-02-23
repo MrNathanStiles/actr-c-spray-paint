@@ -150,11 +150,8 @@ void actr_init(int w, int h)
     }
 
     generateUI();
-    // actr_ui_gradient(200, 200, 200, 200, actr_pack_bytes(255, 0, 255, 100));
 }
 
-extern void picked(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-// actr_canvas2d_fill_gradient_all
 [[clang::export_name("actr_pointer_double_tap")]]
 void actr_pointer_double_tap(int x, int y)
 {
