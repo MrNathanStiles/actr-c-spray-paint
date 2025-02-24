@@ -28,7 +28,19 @@ struct MyState
 
 struct MyState *state;
 
-void genui(int w, int h);
+void assignColor(struct ActrUIControl * control, int color) {
+    control->backgroundColor = color;
+    control->backgroundColorHovered = color;
+    control->backgroundColorFocused = color;
+
+    control->foregroundColor = color;
+    control->foregroundColorHovered = color;
+    control->foregroundColorFocused = color;
+
+    control->borderColor = color;
+    control->borderColorHovered = color;
+    control->borderColorFocused = color;
+}
 void generateUI()
 {
     struct ActrUIControlButton *button;
@@ -42,7 +54,6 @@ void generateUI()
 
     unsigned char r, g, b, a;
     int height = actr_ui_state->canvas_size.h / state->colorCount;
-    genui(actr_ui_state->canvas_size.w, actr_ui_state->canvas_size.h);
     for (int i = 0; i < state->colorCount; i++)
     {
         if (i == 0)
@@ -58,17 +69,8 @@ void generateUI()
             
         }
 
-        button->control.backgroundColor = state->colorCode[i];
-        button->control.backgroundColorHovered = state->colorCode[i];
-        button->control.backgroundColorFocused = state->colorCode[i];
-
-        button->control.foregroundColor = state->colorCode[i];
-        button->control.foregroundColorHovered = state->colorCode[i];
-        button->control.foregroundColorFocused = state->colorCode[i];
-
-        button->control.borderColor = state->colorCode[i];
-        button->control.borderColorHovered = state->colorCode[i];
-        button->control.borderColorFocused = state->colorCode[i];
+        assignColor(&button->control, state->colorCode[i]);
+        
 
         button->control.state = (void *)state->colorCode[i];
         actr_vector_add(state->colorButtons, button);
@@ -176,14 +178,14 @@ void actr_pointer_tap(int x, int y)
     }
     if ((struct ActrUIControlButton *)tapped == state->colorRevert)
     {
-        state->changeButton->control.backgroundColor = state->revertColor;
+        assignColor(&state->changeButton->control, state->revertColor);
         state->color = state->revertColor;
         removeColorPicker();
         return;
     }
     if ((struct ActrUIControlButton *)tapped == state->colorAccept)
     {
-        state->changeButton->control.backgroundColor = state->colorSample->control.backgroundColor;
+        assignColor(&state->changeButton->control, state->colorSample->control.backgroundColor);
         state->color = state->colorSample->control.backgroundColor;
         removeColorPicker();
         return;
@@ -242,7 +244,7 @@ void actr_pointer_up(int x, int y)
     state->pointerDown = 0;
     state->nopaint = 0;
 }
-void container(int x, int y, int w, int h);
+
 void paint(int x, int y)
 {
     if (state->pointerDown == 0 || actr_ui_state->hovered > 0)
@@ -282,7 +284,6 @@ void paint(int x, int y)
         {
             if (state->delete == 0)
             {
-                container(bounds.point.x, bounds.point.y, bounds.size.w, bounds.size.h);
                 struct ActrUIControlContainer *container = actr_ui_container(bounds.point.x, bounds.point.y, bounds.size.w, bounds.size.h);
                 container->control.backgroundColor = state->color;
                 container->control.foregroundColor = state->color;
